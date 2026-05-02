@@ -16,5 +16,5 @@ spring:
 
 app:
   jwt:
-    secret: thisIsMySuperSecretJwtKeyChangeItBeforeProduction123456
+    secret: c21hcnQtZXhwZW5zZS10cmFja2VyLXNlY3JldC1rZXktZm9yLWp3dC10b2tlbi0xMjM0NTY3ODkw
     expiration-ms: 86400000

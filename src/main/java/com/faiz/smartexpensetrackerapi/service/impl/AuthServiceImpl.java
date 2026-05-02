@@ -6,10 +6,13 @@ import com.faiz.smartexpensetrackerapi.dto.auth.RegisterRequest;
 import com.faiz.smartexpensetrackerapi.entity.User;
 import com.faiz.smartexpensetrackerapi.enums.Role;
 import com.faiz.smartexpensetrackerapi.repository.UserRepository;
+import com.faiz.smartexpensetrackerapi.security.JwtService;
 import com.faiz.smartexpensetrackerapi.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +23,8 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
+    private final JwtService jwtService;
 
     @Override
     public AuthResponse register(RegisterRequest request) {
@@ -39,8 +44,11 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
 
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
+        String token = jwtService.generateToken(userDetails);
+
         return AuthResponse.builder()
-                .token(null)
+                .token(token)
                 .message("User registered successfully")
                 .build();
     }
@@ -51,9 +59,12 @@ public class AuthServiceImpl implements AuthService {
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
+        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
+        String token = jwtService.generateToken(userDetails);
+
         return AuthResponse.builder()
-                .token(null)
-                .message("Login successful (JWT next step)")
+                .token(token)
+                .message("Login successful")
                 .build();
     }
 }
