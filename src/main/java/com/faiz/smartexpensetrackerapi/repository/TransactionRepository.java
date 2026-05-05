@@ -32,4 +32,43 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
                                                  @Param("category") Category category,
                                                  @Param("month") int month,
                                                  @Param("year") int year);
+
+    @Query("""
+        SELECT t.category, COALESCE(SUM(t.amount), 0)
+        FROM Transaction t
+        WHERE t.user = :user
+          AND t.type = :type
+          AND YEAR(t.date) = :year
+          AND MONTH(t.date) = :month
+        GROUP BY t.category
+    """)
+    List<Object[]> findCategoryWiseTotals(@Param("user") User user,
+                                          @Param("type") TransactionType type,
+                                          @Param("month") int month,
+                                          @Param("year") int year);
+
+    @Query("""
+        SELECT COALESCE(SUM(t.amount), 0)
+        FROM Transaction t
+        WHERE t.user = :user
+          AND t.type = :type
+          AND YEAR(t.date) = :year
+          AND MONTH(t.date) = :month
+    """)
+    BigDecimal sumByUserTypeAndMonthYear(@Param("user") User user,
+                                         @Param("type") TransactionType type,
+                                         @Param("month") int month,
+                                         @Param("year") int year);
+
+    @Query("""
+        SELECT MONTH(t.date), COALESCE(SUM(t.amount), 0)
+        FROM Transaction t
+        WHERE t.user = :user
+          AND t.type = :type
+          AND YEAR(t.date) = :year
+        GROUP BY MONTH(t.date)
+    """)
+    List<Object[]> findMonthlyTotalsByType(@Param("user") User user,
+                                           @Param("type") TransactionType type,
+                                           @Param("year") int year);
 }
