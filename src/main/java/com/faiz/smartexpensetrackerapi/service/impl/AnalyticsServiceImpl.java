@@ -52,12 +52,17 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         );
         BigDecimal savings = income.subtract(expense);
 
+        BigDecimal totalOverallIncome = transactionRepository.sumByUserAndType(user, TransactionType.INCOME);
+        BigDecimal totalOverallExpense = transactionRepository.sumByUserAndType(user, TransactionType.EXPENSE);
+        BigDecimal balance = totalOverallIncome.subtract(totalOverallExpense);
+
         return MonthlyReportResponse.builder()
                 .month(month)
                 .year(year)
                 .totalIncome(income)
                 .totalExpense(expense)
                 .savings(savings)
+                .balance(balance)
                 .build();
     }
 

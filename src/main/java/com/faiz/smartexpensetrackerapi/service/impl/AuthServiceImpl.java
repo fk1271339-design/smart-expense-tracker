@@ -1,6 +1,7 @@
 package com.faiz.smartexpensetrackerapi.service.impl;
 
 import com.faiz.smartexpensetrackerapi.dto.auth.AuthResponse;
+import com.faiz.smartexpensetrackerapi.dto.auth.ForgotPasswordRequest;
 import com.faiz.smartexpensetrackerapi.dto.auth.LoginRequest;
 import com.faiz.smartexpensetrackerapi.dto.auth.RegisterRequest;
 import com.faiz.smartexpensetrackerapi.entity.User;
@@ -15,6 +16,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -65,6 +68,25 @@ public class AuthServiceImpl implements AuthService {
         return AuthResponse.builder()
                 .token(token)
                 .message("Login successful")
+                .build();
+    }
+
+    @Override
+    public AuthResponse forgotPassword(ForgotPasswordRequest request) {
+        Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
+        
+        if (userOptional.isEmpty()) {
+            return AuthResponse.builder()
+                    .message("User not found with this email")
+                    .build();
+        }
+
+        User user = userOptional.get();
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        return AuthResponse.builder()
+                .message("Password updated successfully")
                 .build();
     }
 }

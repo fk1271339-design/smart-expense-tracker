@@ -71,4 +71,13 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Object[]> findMonthlyTotalsByType(@Param("user") User user,
                                            @Param("type") TransactionType type,
                                            @Param("year") int year);
+
+    @Query("""
+        SELECT COALESCE(SUM(t.amount), 0)
+        FROM Transaction t
+        WHERE t.user = :user
+          AND t.type = :type
+    """)
+    BigDecimal sumByUserAndType(@Param("user") User user,
+                                @Param("type") TransactionType type);
 }

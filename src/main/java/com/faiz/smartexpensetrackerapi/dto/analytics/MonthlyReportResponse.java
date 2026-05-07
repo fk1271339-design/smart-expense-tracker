@@ -15,4 +15,5 @@ public class MonthlyReportResponse {
     private BigDecimal totalIncome;
     private BigDecimal totalExpense;
     private BigDecimal savings;
+    private BigDecimal balance;
 }
