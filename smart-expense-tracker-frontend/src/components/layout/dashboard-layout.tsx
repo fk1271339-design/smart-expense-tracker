@@ -17,6 +17,17 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
+import { 
+  DropdownMenu,
+  DropdownMenuPortal,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
 const sidebarItems = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Transactions', href: '/transactions', icon: ArrowLeftRight },
@@ -90,7 +101,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             })}
           </nav>
 
-          <div className="p-4 border-t border-border">
+          <div className="p-4 border-t border-border lg:hidden">
             <Button 
               variant="ghost" 
               className="w-full justify-start text-muted-foreground hover:text-destructive"
@@ -106,26 +117,59 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Topbar */}
-        <header className="flex items-center justify-between h-16 px-6 bg-card border-b border-border">
+        <header className="flex items-center justify-between h-16 px-6 bg-card border-b border-border shadow-sm">
           <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setIsSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
           </Button>
           
           <div className="flex items-center ml-auto space-x-4">
             <div className="flex flex-col items-end hidden sm:flex">
-              <span className="text-sm font-medium">{user.name}</span>
+              <span className="text-sm font-semibold">{user.name}</span>
               <span className="text-xs text-muted-foreground">{user.email}</span>
             </div>
-            <div className="h-10 w-10 rounded-full bg-accent flex items-center justify-center text-accent-foreground">
-              <User className="h-6 w-6" />
-            </div>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger className="relative h-10 w-10 rounded-full bg-accent flex items-center justify-center overflow-hidden hover:bg-accent/80 transition-all border border-border cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                <User className="h-6 w-6 text-accent-foreground" />
+              </DropdownMenuTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuContent className="w-56 z-50 shadow-lg bg-card border border-border p-1 rounded-md" align="end" sideOffset={5}>
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel className="px-2 py-1.5 text-xs font-semibold text-muted-foreground border-b border-border/50 mb-1">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none text-foreground">{user.name}</p>
+                        <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuItem 
+                      onClick={() => router.push('/dashboard')}
+                      className="flex items-center px-2 py-2 text-sm rounded-sm cursor-pointer hover:bg-accent hover:text-accent-foreground outline-none transition-colors"
+                    >
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      <span>Dashboard</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="h-px bg-border my-1" />
+                    <DropdownMenuItem 
+                      className="flex items-center px-2 py-2 text-sm rounded-sm cursor-pointer text-destructive hover:bg-destructive/10 outline-none transition-colors"
+                      onClick={logout}
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenuPortal>
+            </DropdownMenu>
           </div>
         </header>
 
-        <main className="flex-1 p-6 overflow-y-auto">
-          {children}
+        <main className="flex-1 p-6 overflow-y-auto bg-slate-50/30">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
       </div>
     </div>
   );
 }
+
